@@ -1,0 +1,35 @@
+# kubectl -n default create configmap bar --from-literal=TEST_KEY=TESTVALUE
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bar
+data:
+  TEST_KEY: TESTVALUE
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-2
+  namespace: default
+  labels:
+    app: po-wei
+    backend: python
+spec:
+  containers:
+  - image: nginx:latest
+    imagePullPolicy: Always
+    name: nginx
+    ports:
+      - containerPort: 80
+        protocol: TCP
+    volumeMounts:
+    - mountPath: /usr/share/nginx/html
+      name: config-volume
+  volumes:
+  - name: config-volume
+    configMap:
+      name: bar
+      items:
+        - key: TEST_KEY
+          path: index.html
